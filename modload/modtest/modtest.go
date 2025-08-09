@@ -20,7 +20,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/goplus/mod/modload"
+	"github.com/goplus/xmod/modload"
 )
 
 func LoadFrom(gomod, gopmod string, gomodText, gopmodText string) (mod modload.Module, err error) {

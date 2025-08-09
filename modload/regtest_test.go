@@ -20,9 +20,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/goplus/mod/modload/modtest"
-	"github.com/goplus/mod/xgomod"
-	"golang.org/x/mod/module"
+	"github.com/goplus/xmod/modload/modtest"
+	"github.com/goplus/xmod/xgomod"
+	"golang.org/x/xmod/module"
 )
 
 func TestGopClass(t *testing.T) {

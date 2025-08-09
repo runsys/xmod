@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/qiniu/x/errors"
-	"golang.org/x/mod/modfile"
+	"golang.org/x/xmod/modfile"
 )
 
 func TestClassKind(t *testing.T) {

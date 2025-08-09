@@ -11,7 +11,7 @@ import (
 // logic as the Go command:
 //  1. Use GOMODCACHE if set.
 //  2. Otherwise use $GOPATH/pkg/mod.
-//  3. If GOPATH is not set, default to "/go/pkg/mod".
+//  3. If GOPATH is not set, default to "/go/pkg/xmod".
 func getGOMODCACHE() string {
 	if dir := os.Getenv("GOMODCACHE"); dir != "" {
 		return dir

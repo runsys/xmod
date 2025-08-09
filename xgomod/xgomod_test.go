@@ -23,11 +23,11 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/goplus/mod"
-	"github.com/goplus/mod/modcache"
-	"github.com/goplus/mod/modload/modtest"
+	"github.com/goplus/xmod"
+	"github.com/goplus/xmod/modcache"
+	"github.com/goplus/xmod/modload/modtest"
 	"github.com/qiniu/x/errors"
-	"golang.org/x/mod/module"
+	"golang.org/x/xmod/module"
 )
 
 func TestPkgId(t *testing.T) {

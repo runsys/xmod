@@ -22,12 +22,17 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"os"
 
-	"github.com/goplus/mod/modcache"
-	"github.com/goplus/mod/modfetch"
-	"github.com/goplus/mod/modload"
+	"github.com/goplus/xmod/modcache"
+	"github.com/goplus/xmod/env"
+	"github.com/goplus/xmod/modfetch"
+	"github.com/goplus/xmod/modfile"
+	"github.com/goplus/xmod/sumfile"
+	"github.com/goplus/xmod/modload"
 	"github.com/qiniu/x/errors"
 	"golang.org/x/mod/module"
+	gomodfile "golang.org/x/mod/modfile"
 )
 
 var (
@@ -238,4 +243,156 @@ var Default = New(modload.Default)
 
 var goroot = runtime.GOROOT()
 
+
+func findReplaceGopMod(work *gomodfile.WorkFile) bool {
+	for _, r := range work.Replace {
+		if r.Old.Path == xgoMod {
+			return true
+		}
+	}
+	return false
+}
+
+
+const (
+	xgoMod = "github.com/goplus/gop"
+	xMod   = "github.com/qiniu/x"
+)
+
+const (
+	FlagDepModXGo = 1 << iota // depends module github.com/goplus/gop
+	FlagDepModX               // depends module github.com/qiniu/x
+)
+
 // -----------------------------------------------------------------------------
+
+// SaveWithXGoMod adds `require github.com/goplus/gop` and saves all
+// changes of this module.
+func (p Module) SaveWithXGoMod(xgo *env.XGo, flags int) (err error) {
+	old := p.checkXgoDeps()
+	if (flags &^ old) == 0 { // nothing to do
+		return
+	}
+
+	xgoVer := getXgoVer(xgo)
+	p.requireXgo(xgo, xgoVer, old, flags)
+	return p.Save()
+}
+
+
+func (p Module) checkXgoDeps() (flags int) {
+	switch p.Path() {
+	case xgoMod:
+		return FlagDepModXGo | FlagDepModX
+	case xMod:
+		return FlagDepModX
+	}
+	for _, r := range p.File.Require {
+		switch r.Mod.Path {
+		case xgoMod:
+			flags |= FlagDepModXGo
+		case xMod:
+			flags |= FlagDepModX
+		}
+	}
+	return
+}
+
+
+// requireXgo adds require for the github.com/goplus/gop module.
+func (p Module) requireXgo(xgo *env.XGo, xgoVer string, old, flags int) {
+	if (flags&FlagDepModXGo) != 0 && (old&FlagDepModXGo) == 0 {
+		p.File.AddRequire(xgoMod, xgoVer)
+		p.updateWorkfile(xgo, xgoVer)
+	}
+	if (flags&FlagDepModX) != 0 && (old&FlagDepModX) == 0 { // depends module github.com/qiniu/x
+		if x, xsum, ok := getXVer(xgo); ok {
+			p.File.AddRequire(x.Path, x.Version)
+			if sumf, err := sumfile.Load(p.sumFile()); err == nil && sumf.Lookup(xMod) == nil {
+				sumf.Add(xsum)
+				sumf.Save()
+			}
+		}
+	}
+}
+
+func getXVer(xgo *env.XGo) (modVer module.Version, xsum []string, ok bool) {
+	if mod, err := LoadFrom(xgo.Root+"/go.mod", ""); err == nil {
+		for _, r := range mod.File.Require {
+			if r.Mod.Path == xMod {
+				if sumf, err := sumfile.Load(xgo.Root + "/go.sum"); err == nil {
+					return r.Mod, sumf.Lookup(xMod), true
+				}
+			}
+		}
+	}
+	return
+}
+
+func getXgoVer(gop *env.XGo) string {
+	ver := gop.Version
+	if pos := strings.IndexByte(ver, ' '); pos > 0 { // v1.2.0 devel
+		ver = ver[:pos]
+	}
+	return ver
+}
+
+
+func (p Module) updateWorkfile(xgo *env.XGo, xgoVer string) (err error) {
+	var work *gomodfile.WorkFile
+	var workFile = p.workFile()
+	b, err := os.ReadFile(workFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			b = []byte(`go ` + p.Go.Version)
+		} else {
+			return
+		}
+	}
+	var fixed bool
+	fix := fixVersion(&fixed)
+	if work, err = gomodfile.ParseWork(workFile, b, fix); err != nil {
+		return
+	}
+	if findReplaceGopMod(work) {
+		return
+	}
+	work.AddUse(".", p.Path())
+	work.AddReplace(xgoMod, xgoVer, xgo.Root, "")
+	return os.WriteFile(workFile, gomodfile.Format(work.Syntax), 0666)
+}
+
+
+func (p Module) sumFile() string {
+	if syn := p.Syntax; syn != nil {
+		dir, _ := filepath.Split(syn.Name)
+		return dir + "go.sum"
+	}
+	return ""
+}
+
+
+func (p Module) workFile() string {
+	if syn := p.Syntax; syn != nil {
+		dir, _ := filepath.Split(syn.Name)
+		return dir + "go.work"
+	}
+	return ""
+}
+
+
+
+// fixVersion returns a modfile.VersionFixer implemented using the Query function.
+//
+// It resolves commit hashes and branch names to versions,
+// canonicalizes versions that appeared in early vgo drafts,
+// and does nothing for versions that already appear to be canonical.
+//
+// The VersionFixer sets 'fixed' if it ever returns a non-canonical version.
+func fixVersion(fixed *bool) modfile.VersionFixer {
+	return func(path, vers string) (resolved string, err error) {
+		// do nothing
+		return vers, nil
+	}
+}
+

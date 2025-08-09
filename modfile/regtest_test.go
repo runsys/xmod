@@ -19,8 +19,8 @@ package modfile_test
 import (
 	"testing"
 
-	"github.com/goplus/mod/modload/modtest"
-	"github.com/goplus/mod/xgomod"
+	"github.com/goplus/xmod/modload/modtest"
+	"github.com/goplus/xmod/xgomod"
 )
 
 func TestGopMod(t *testing.T) {

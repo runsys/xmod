@@ -23,12 +23,12 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/goplus/mod"
-	"github.com/goplus/mod/env"
-	"github.com/goplus/mod/modfile"
+	"github.com/goplus/xmod"
+	"github.com/goplus/xmod/env"
+	"github.com/goplus/xmod/modfile"
 	"github.com/qiniu/x/errors"
-	gomodfile "golang.org/x/mod/modfile"
-	"golang.org/x/mod/module"
+	gomodfile "golang.org/x/xmod/modfile"
+	"golang.org/x/xmod/module"
 )
 
 func TestCheckGopDeps(t *testing.T) {
