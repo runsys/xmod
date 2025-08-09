@@ -17,11 +17,11 @@
 package xgomod
 
 import (
-	"github.com/goplus/xmod"
-	"github.com/goplus/xmod/modcache"
-	"github.com/goplus/xmod/modfetch"
-	"github.com/goplus/xmod/modfile"
-	"github.com/goplus/xmod/modload"
+	"github.com/runsys/xmod"
+	"github.com/runsys/xmod/modcache"
+	"github.com/runsys/xmod/modfetch"
+	"github.com/runsys/xmod/modfile"
+	"github.com/runsys/xmod/modload"
 	"github.com/qiniu/x/errors"
 	"golang.org/x/mod/module"
 )

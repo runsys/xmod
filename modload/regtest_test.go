@@ -20,8 +20,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/goplus/xmod/modload/modtest"
-	"github.com/goplus/xmod/xgomod"
+	"github.com/runsys/xmod/modload/modtest"
+	"github.com/runsys/xmod/xgomod"
 	"golang.org/x/xmod/module"
 )
 

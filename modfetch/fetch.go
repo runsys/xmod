@@ -28,8 +28,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	xmod "github.com/goplus/xmod"
-	"github.com/goplus/xmod/modcache"
+	xmod "github.com/runsys/xmod"
+	"github.com/runsys/xmod/modcache"
 	"golang.org/x/mod/module"
 	"golang.org/x/mod/semver"
 )

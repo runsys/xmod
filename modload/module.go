@@ -22,10 +22,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/goplus/xmod"
-	"github.com/goplus/xmod/env"
-	"github.com/goplus/xmod/modfile"
-	"github.com/goplus/xmod/sumfile"
+	"github.com/runsys/xmod"
+	"github.com/runsys/xmod/env"
+	"github.com/runsys/xmod/modfile"
+	"github.com/runsys/xmod/sumfile"
 	"github.com/qiniu/x/errors"
 	"golang.org/x/mod/module"
 

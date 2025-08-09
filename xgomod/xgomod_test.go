@@ -23,9 +23,9 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/goplus/xmod"
-	"github.com/goplus/xmod/modcache"
-	"github.com/goplus/xmod/modload/modtest"
+	"github.com/runsys/xmod"
+	"github.com/runsys/xmod/modcache"
+	"github.com/runsys/xmod/modload/modtest"
 	"github.com/qiniu/x/errors"
 	"golang.org/x/xmod/module"
 )
